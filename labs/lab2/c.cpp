@@ -18,7 +18,7 @@ struct ll {
         head = NULL;
         tail = NULL;
     }
-    void add(int x) {
+    void add(int x) { 
         node * n = new node(x);
         if(head == NULL) {
             head = n;
@@ -40,7 +40,7 @@ struct ll {
         node * curr = head;
         while(curr != NULL && curr ->next != NULL) {
             curr ->next = curr->next->next;
-            curr = curr ->next;
+            curr = curr ->next; 
         }
     }
 };
