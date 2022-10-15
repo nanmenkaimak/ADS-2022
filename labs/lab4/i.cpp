@@ -1,123 +1,126 @@
 #include <bits/stdc++.h>
-
 using namespace std;
-
-struct Node {
-	int data;
-	Node* left;
-	Node* right;
-
-	Node(int data) {
-		this->data = data;
-		left = NULL;
-		right = NULL;
-	} 
+struct Node{
+    int val;
+    Node *left;
+    Node *right;
+    int multiplicity;
+    Node(int val){
+        this->val = val;
+        this->left = this->right = NULL;
+        this->multiplicity = 1;
+    }
 };
 
-map<int, int> mp;
-
-Node* getMin(Node* root) {
-	while (root->left != NULL) {
-		root = root->left;
-	}
-	return root;
-}
-
-Node * add(Node* root, int data) {
-	if (root == NULL) {
-		root = new Node(data);
-        mp[data]++;
-	} else if (root->data > data) {
-		if (root->left == NULL) {
-			root->left = new Node(data);
-            mp[data]++;
-		} else {
-			add(root->left, data);
-		}
-	} else if (root->data < data) {
-		if (root->right == NULL) {
-			root->right = new Node(data);
-            mp[data]++;
-		} else {
-			add(root->right, data);
-		}
-	} else if (root->data == data) {
-        mp[data]++;
+struct BinSearchTree{
+    Node* root;
+    BinSearchTree() {
+        root = NULL;
     }
-    return root;
-}
+private:
+    Node* add(int x, Node *cur){
+        if(cur == NULL){
+            cur = new Node(x);
+        }
+        else if(x == cur->val){
+            cur->multiplicity++;
+            return cur;
+        }
+        else if (x < cur->val) cur->left = add(x, cur->left);
+        else cur->right = add(x,cur->right);
+        return cur;
+    }
+    int find(int x, Node *cur){
+        if(cur == NULL) return 0;
+        if(x == cur->val)
+            return cur->multiplicity;
 
-Node* find(Node* root, int x) {
-	if (root == NULL) {
-		return NULL;
-	} else if (root->data == x) {
-		return root;
-	} else if (root->data < x) {
-		return find(root->right, x);
-	} else {
-		return find(root->left, x);
-	}
-}
+        else if(x < cur->val) return find(x, cur->left);
+        else return find(x, cur->right);
+    }
+    int rightmost(Node *cur){
+        if(cur == NULL) return -1;
+        if(cur->right == NULL) return cur->val;
+        return rightmost(cur->right);
+    }
+    Node *_delete(int x, Node *cur){
+        if(cur == NULL) return NULL;
+        
+        if(x < cur->val)
+            cur->left = _delete(x, cur->left);
 
-Node * deleteNode(Node* root, int data) {
-    Node * kkk = find(root, data);
-	if (root == NULL) {
-		return NULL;
-	} else if(kkk != NULL && mp[data] > 1) {
-        mp[data]--;
-        return root;
-    } else { 
-        mp[data]--;
-        if (root->data > data) {
-            deleteNode(root->left, data);
-            return root;
-        } else if (root->data < data) {
-            deleteNode(root->right, data);
-            return root;
-        } else {
-            if (root->left == NULL && root->right == NULL) {
-                delete root;
-                return NULL;
-            } else if (root->right == NULL) {
-                Node* temp = root->left;
-                delete root;
-                return temp;
-            } else if (root->left == NULL) {
-                Node* temp = root->right;
-                delete root;
-                return temp;
-            } else {
-                Node* temp = getMin(root->right);
-                root->data = temp->data;
-                deleteNode(root->right, temp->data);
-                return root;
+        else if (x > cur->val){
+            cur->right = _delete(x, cur->right);
+        }
+        else{
+            if(cur->multiplicity != 0){
+                cur->multiplicity--;
+                return cur;
+            }
+            else{
+                if(!cur->left && !cur->right){
+                    delete cur;
+                    return NULL;
+                }
+                else if(cur->left && !cur->right){
+                    Node *temp = cur->left;
+                    delete cur;
+                    return temp;
+                }
+                else if(!cur->left && cur->right){
+                    Node *temp = cur->right;
+                    delete cur;
+                    return temp;
+                } 
+                else if(cur->left && cur->right){
+                    cur->val = rightmost(cur->left);
+                    cur->left = _delete(cur->val, cur->left);
+                }
             }
         }
-}
-}
+        return cur;
+    }
+    
 
+public:
+    void add(int x){
+        this->root = add(x, root);
+    }
+
+    int getCnt(int x){
+        return find(x, root);
+    }
+
+    void del(int x){
+        this->root = _delete(x, root);
+    }
+
+};
 
 
 int main() {
-    Node * root = NULL;
-    Node * result;
-    int n; cin >> n;
-    for(int i = 0; i < n; i++) {
-        string s; cin >> s;
-        if(s == "insert") {
-            int x; cin >> x;
-            result = add(root, x);
-            if(root == NULL) {
-                root = result;
-            }
-        } else if (s == "delete") {
-            int x; cin >> x;
-            result = deleteNode(root, x);
-            if(result == NULL) 
-                root = NULL;
-        } else if (s == "cnt") {
-            int x; cin >> x;
-            cout << mp[x] <<endl;
+    int n;
+    cin >> n;
+    BinSearchTree tree;
+    string s;
+    for (int i = 0; i < n; i++) {
+        cin >> s;
+        if(s == "insert"){
+            int x;
+            cin >> x;
+            tree.add(x);
+        }
+        else if(s == "cnt"){
+            int x;
+            cin >> x;
+            cout << tree.getCnt(x) << endl;
+        }
+        else{
+            int x;
+            cin >> x;
+            tree.del(x);
         }
     }
+
+    return 0;
 }
