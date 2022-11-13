@@ -7,16 +7,17 @@ using namespace std;
 //     int size;
 // };
 
-// bool cmp(Words &a, Words &b) {
-    
-//     return a.size < b.size;
-// }
+bool cmp(string a, string b) {
+    if(a.size() == b.size()) return true;
+    return a.size() < b.size();
+}
 
 
-void merge(int * a, int l, int m, int r){
+void merge(vector<string> &a, int l, int m, int r){
     int i1 = m - l + 1;
     int i2 = r - m;
-    int L[i1], R[i2];
+    vector<string> L(i1);
+    vector<string> R(i2);
 
     for(int k = 0; k < i1; k++) {
         L[k] = a[l + k];
@@ -27,7 +28,7 @@ void merge(int * a, int l, int m, int r){
     int j = 0, i = 0, k = l;
 
     while(i < i1 && j < i2){
-        if(L[i] <= R[j]) {
+        if(cmp(L[i], R[j])) {
             a[k] = L[i];
             i++;
         } else {
@@ -49,7 +50,7 @@ void merge(int * a, int l, int m, int r){
 
 }
 
-void msort(int * a, int l, int r) {
+void msort(vector<string> &a, int l, int r) {
     if(l < r) {
         int m = l + (r - l) / 2;
         msort(a, l, m);
@@ -60,9 +61,29 @@ void msort(int * a, int l, int r) {
 
 int main() {
     int n; cin >> n;
+    string h; getline(cin,h);
+    while(n--) {
+        string s; 
+        getline(cin, s);
+        vector<string> v;
+        int k = 0;
+        string word = "";
+        for(int j = 0; j < s.size(); j++) {
+            if(s[j] == ' ') {
+                v.push_back(word);
+                word = "";
+            } else {
+                word += s[j];
+            }
+        }
+        v.push_back(word);
 
-    for(int i = 0; i < n + 1; i++) {
-        
+        msort(v, 0, v.size() - 1);
+
+        for(auto j : v)
+            cout << j <<" ";
+
+        cout <<endl;
     }
     
     
