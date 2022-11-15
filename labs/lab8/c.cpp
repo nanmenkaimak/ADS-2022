@@ -35,9 +35,8 @@ void f(string t, string s) {
             d -= h[i-1];
         }
         if(d == (h_s * p[i]) % q && t.substr(i, m) == s) {
-            int h = m + i - 1;
             int j = i;
-            while(j <= h) {
+            while(j <= m + i - 1) {
                 st.insert(j);
                 j++;
             }
@@ -48,7 +47,6 @@ void f(string t, string s) {
 int main() {
     string s; cin >> s;
     int n; cin >> n;
-    bool ok = true;
     for(int i = 0; i < n; i++) {
         string x; cin >> x;
         f(s, x);
